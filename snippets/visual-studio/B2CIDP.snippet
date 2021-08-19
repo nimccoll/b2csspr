@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets
+    xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>B2C IdentityServer IDP</Title>
+      <Author>Nicholas J. McCollum</Author>
+      <Description>Inserts a ClaimsProvider block for an IdentityServer IDP</Description>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>DisplayName</ID>
+          <Default>Identity Server 4</Default>
+          <ToolTip>The display name of the ClaimsProvider and TechnicalProfile</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>TechnicalProfileId</ID>
+          <Default>Identity-Server4</Default>
+          <ToolTip>The unique identifier of the TechnicalProfile</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>Description</ID>
+          <Default>Login with your Identity Server account</Default>
+          <ToolTip>The TechnicalProfile description</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>MetadataUrl</ID>
+          <Default>https://Identity Server FQDN/.well-known/openid-configuration</Default>
+          <ToolTip>The metadata URL of the Identity Server</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>ClientId</ID>
+          <Default>ClientId</Default>
+          <ToolTip>The ClientID registered in Identity Server for AAD B2C</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>TokenIssuerPrefixes</ID>
+          <Default>https://Identity Server FQDN</Default>
+          <ToolTip>The Identity Servers that can be used to sign in</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>ClientSecret</ID>
+          <Default>B2C_1A_IdentityServer4Secret</Default>
+          <ToolTip>The Azure AD B2C location that stores the Identity Server client secret</ToolTip>
+        </Literal>
+      </Declarations>
+      <Code Language="XML">
+        <![CDATA[
+        <ClaimsProvider>
+          <Domain>identityserver</Domain>
+          <DisplayName>$DisplayName$</DisplayName>
+          <TechnicalProfiles>
+            <TechnicalProfile Id="$TechnicalProfileId$">
+              <DisplayName>$DisplayName$</DisplayName>
+              <Description>$Description$</Description>
+              <Protocol Name="OpenIdConnect" />
+              <Metadata>
+                <Item Key="METADATA">$MetadataUrl$</Item>
+                <!-- Update the Client ID below to the Application ID -->
+                <Item Key="client_id">$ClientId$</Item>
+                <Item Key="response_types">code</Item>
+                <Item Key="scope">openid</Item>
+                <Item Key="response_mode">form_post</Item>
+                <Item Key="HttpBinding">POST</Item>
+                <Item Key="UsePolicyInRedirectUri">false</Item>
+                <Item Key="DiscoverMetadataByTokenIssuer">true</Item>
+                <!-- The key below allows you to specify each IdentityServer that can be used to sign in. Update the URLs below for each server. -->
+                <Item Key="ValidTokenIssuerPrefixes">$TokenIssuerPrefixes$</Item>
+              </Metadata>
+              <CryptographicKeys>
+                <Key Id="client_secret" StorageReferenceId="$ClientSecret$" />
+              </CryptographicKeys>
+              <OutputClaims>
+                <OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="sub" />
+                <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name" />
+                <OutputClaim ClaimTypeReferenceId="surName" PartnerClaimType="family_name" />
+                <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email" />
+                <OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+                <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="socialIdpAuthentication" AlwaysUseDefaultValue="true" />
+                <OutputClaim ClaimTypeReferenceId="identityProvider" PartnerClaimType="iss" />
+              </OutputClaims>
+              <OutputClaimsTransformations>
+                <OutputClaimsTransformation ReferenceId="CreateRandomUPNUserName" />
+                <OutputClaimsTransformation ReferenceId="CreateUserPrincipalName" />
+                <OutputClaimsTransformation ReferenceId="CreateAlternativeSecurityId" />
+                <OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromAlternativeSecurityId" />
+              </OutputClaimsTransformations>
+              <UseTechnicalProfileForSessionManagement ReferenceId="SM-SocialLogin" />
+            </TechnicalProfile>
+          </TechnicalProfiles>
+        </ClaimsProvider>
+            ]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>B2C SalesForce SAML IDP</Title>
+      <Author>Nicholas J. McCollum</Author>
+      <Description>Inserts a ClaimsProvider block for a SalesForce SAML IDP</Description>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>DisplayName</ID>
+          <Default>Salesforce (SAML)</Default>
+          <ToolTip>The display name of the ClaimsProvider and TechnicalProfile</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>TechnicalProfileId</ID>
+          <Default>salesforce</Default>
+          <ToolTip>The unique identifier of the TechnicalProfile</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>Description</ID>
+          <Default>Login with your Salesforce account</Default>
+          <ToolTip>The TechnicalProfile description</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>PartnerEntity</ID>
+          <Default>https://Salesforce FQDN/.well-known/samlidp/metadatafile name.xml</Default>
+          <ToolTip>The metadata URL of the partner entity in SalesForce</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>ClientSecret</ID>
+          <Default>B2C_1A_SAMLSigningCert</Default>
+          <ToolTip>The Azure AD B2C location that stores the SAML signing certificate</ToolTip>
+        </Literal>
+      </Declarations>
+      <Code Language="XML">
+        <![CDATA[
+        <ClaimsProvider>
+          <Domain>salesforce</Domain>
+          <DisplayName>$DisplayName$</DisplayName>
+          <TechnicalProfiles>
+            <TechnicalProfile Id="$TechnicalProfileId$">
+              <DisplayName>$DisplayName$</DisplayName>
+              <Description>$Description$</Description>
+              <Protocol Name="SAML2"/>
+              <Metadata>
+                <Item Key="WantsEncryptedAssertions">false</Item>
+                <Item Key="WantsSignedAssertions">false</Item>
+                <Item Key="PartnerEntity">$PartnerEntity$</Item>
+              </Metadata>
+              <CryptographicKeys>
+                <Key Id="SamlMessageSigning" StorageReferenceId="$ClientSecret$"/>
+              </CryptographicKeys>
+              <OutputClaims>
+                <OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="userId"/>
+                <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name"/>
+                <OutputClaim ClaimTypeReferenceId="surname" PartnerClaimType="family_name"/>
+                <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="email"/>
+                <OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="username"/>
+                <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="socialIdpAuthentication"/>
+                <OutputClaim ClaimTypeReferenceId="identityProvider" DefaultValue="SAMLIdp" />
+              </OutputClaims>
+              <OutputClaimsTransformations>
+                <OutputClaimsTransformation ReferenceId="CreateRandomUPNUserName"/>
+                <OutputClaimsTransformation ReferenceId="CreateUserPrincipalName"/>
+                <OutputClaimsTransformation ReferenceId="CreateAlternativeSecurityId"/>
+                <OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromAlternativeSecurityId"/>
+              </OutputClaimsTransformations>
+              <UseTechnicalProfileForSessionManagement ReferenceId="SM-Saml-idp"/>
+            </TechnicalProfile>
+          </TechnicalProfiles>
+        </ClaimsProvider>
+                ]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>B2C Azure AD IDP</Title>
+      <Author>Nicholas J. McCollum</Author>
+      <Description>Inserts a ClaimsProvider block for an Azure AD IDP</Description>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>DisplayName</ID>
+          <Default>Organization or School Account</Default>
+          <ToolTip>The display name of the ClaimsProvider and TechnicalProfile</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>TechnicalProfileId</ID>
+          <Default>Common-AAD</Default>
+          <ToolTip>The unique identifier of the TechnicalProfile</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>Description</ID>
+          <Default>Login with your organization or school account</Default>
+          <ToolTip>The TechnicalProfile description</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>ClientId</ID>
+          <Default>ClientId</Default>
+          <ToolTip>The ClientID registered in Azure AD B2C that represents an AAD tenant</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>TokenIssuerPrefixes</ID>
+          <Default>https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47</Default>
+          <ToolTip>Comma-separated list of the Azure AD tenants that can be used to sign in</ToolTip>
+        </Literal>
+        <Literal>
+          <ID>ClientSecret</ID>
+          <Default>B2C_1A_AADAppSecret</Default>
+          <ToolTip>The Azure AD B2C location that stores the Client Secret of the application registration</ToolTip>
+        </Literal>
+      </Declarations>
+      <Code Language="XML">
+        <![CDATA[
+        <ClaimsProvider>
+          <Domain>commonaad</Domain>
+          <DisplayName>$DisplayName$</DisplayName>
+          <TechnicalProfiles>
+            <TechnicalProfile Id="$TechnicalProfileId$">
+              <DisplayName>$DisplayName$</DisplayName>
+              <Description>$Description$</Description>
+              <Protocol Name="OpenIdConnect" />
+              <Metadata>
+                <Item Key="METADATA">https://login.windows.net/common/.well-known/openid-configuration</Item>
+                <!-- Update the Client ID below to the Application ID -->
+                <Item Key="client_id">$ClientId$</Item>
+                <Item Key="response_types">code</Item>
+                <Item Key="scope">openid</Item>
+                <Item Key="response_mode">form_post</Item>
+                <Item Key="HttpBinding">POST</Item>
+                <Item Key="UsePolicyInRedirectUri">false</Item>
+                <Item Key="DiscoverMetadataByTokenIssuer">true</Item>
+                <!-- The key below allows you to specify each of the Azure AD tenants that can be used to sign in. Update the GUIDs below for each tenant. -->
+                <Item Key="ValidTokenIssuerPrefixes">$TokenIssuerPrefixes$</Item>
+                <!-- The commented key below specifies that users from any tenant can sign-in. Uncomment if you would like anyone with an Azure AD account to be able to sign in. -->
+                <!-- <Item Key="ValidTokenIssuerPrefixes">https://sts.windows.net/</Item> -->
+              </Metadata>
+              <CryptographicKeys>
+                <Key Id="client_secret" StorageReferenceId="$ClientSecret$" />
+              </CryptographicKeys>
+              <OutputClaims>
+                <OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="oid" />
+                <OutputClaim ClaimTypeReferenceId="tenantId" PartnerClaimType="tid" />
+                <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name" />
+                <OutputClaim ClaimTypeReferenceId="surName" PartnerClaimType="family_name" />
+                <OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+                <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="socialIdpAuthentication" AlwaysUseDefaultValue="true" />
+                <OutputClaim ClaimTypeReferenceId="identityProvider" PartnerClaimType="iss" />
+              </OutputClaims>
+              <OutputClaimsTransformations>
+                <OutputClaimsTransformation ReferenceId="CreateRandomUPNUserName" />
+                <OutputClaimsTransformation ReferenceId="CreateUserPrincipalName" />
+                <OutputClaimsTransformation ReferenceId="CreateAlternativeSecurityId" />
+                <OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromAlternativeSecurityId" />
+              </OutputClaimsTransformations>
+              <UseTechnicalProfileForSessionManagement ReferenceId="SM-SocialLogin" />
+            </TechnicalProfile>
+          </TechnicalProfiles>
+        </ClaimsProvider>
+        ]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
